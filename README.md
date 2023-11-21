@@ -32,6 +32,11 @@ Also, we assume that:
 
 3. The same flight within a single trip can only be taken once. For example, Berlin -> Paris and Paris -> Berlin can exist within the same trip, but Berlin -> Paris and Berlin -> Paris again are not possible.
 
+4. The start point is a vertex that either has no incoming edges or has one more outgoing edge than incoming edges.
+
+5. 5.The end point is a vertex that either has no outgoing edges or has one more incoming edge than outgoing edges.
+
+
 Based on the above, I suggest representing a trip as a directed graph. 
 To ensure that there is at least one path that allows visiting all the nodes of the graph, passing over the same edge only once as well as to count the number of incoming and outgoing edges, 
 I used the DFS algorithm, which remembers visited edges and vertices. I run it for each vertex till all vertices would be visited 
@@ -42,11 +47,14 @@ in 1 dfs run or dfs already tried to start from all known vertices.
 1. For tests running, staying in project's root, run 
 ```make test```
 
-2. To run app, staying in project's, run
+2. To run app first time, staying in project's, run
 ```make build && make run```
 
 It will build docker image and run app in docker container. 
 Requirements: you should have installed docker 20+ version and docker compose 2+ version.
+
+If you have already built image, just run
+```make run```
 
 ### How to interact with app
 #### Successful examples
