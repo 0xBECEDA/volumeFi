@@ -30,6 +30,13 @@ Also, we assume that:
 2. Flights must be connected as a chain without gap. For example, flights chain "Berlin->Milan, Milan->Paris" is valid, 
    but "Berlin->Milan, Paris->Madrid" isn't. It means, that exists at least 1 path to visit all given airports. 
 
+3. The same flight within a single trip can only be taken once. For example, Berlin -> Paris and Paris -> Berlin can exist within the same trip, but Berlin -> Paris and Berlin -> Paris again are not possible.
+
+Based on the above, I suggest representing a trip as a directed graph. 
+To ensure that there is at least one path that allows visiting all the nodes of the graph, passing over the same edge only once as well as to count the number of incoming and outgoing edges, 
+I used the DFS algorithm, which remembers visited edges and vertices. I run it for each vertex till all vertices would be visited 
+in 1 dfs run or dfs already tried to start from all known vertices.  
+
 ## How to run
 
 1. For tests running, staying in project's root, run 

@@ -70,18 +70,22 @@ func BuildGraph(edgesPairs [][]string) (*Graph, error) {
 	return graph, nil
 }
 
-// dfs implements improves dfs algorythm: it tries to visit every vertex and counts incoming and
-// outgoing edges for each. Graph can contain cycles and can be unconnected,
-// that's why dfs remembers visited vertices.
+// dfs tries to visit every vertex, passing over the same edge only once, and counts incoming and
+// outgoing edges for each.
 func (g *Graph) dfs(
 	currentVertex string,
-	visited map[string]bool,
+	visitedVertices map[string]bool,
+	visitedEdges map[*Edge]bool,
 	outEdges map[string]int,
 	inEdges map[string]int,
 ) {
-	visited[currentVertex] = true
+	visitedVertices[currentVertex] = true
 	for key, edge := range g.vertices[currentVertex].edges {
+		if visitedEdges[edge] {
+			continue
+		}
 
+		visitedEdges[edge] = true
 		// if there is an edge between vertices A and B,
 		// then vertex A (the current vertex) has an outgoing edge,
 		// and vertex B has an incoming edge
@@ -101,60 +105,60 @@ func (g *Graph) dfs(
 			inEdges[edge.vertex.val] = 1
 		}
 
-		if _, found := visited[key]; !found {
-			g.dfs(edge.vertex.val, visited, outEdges, inEdges)
+		if _, found := visitedVertices[key]; !found {
+			g.dfs(edge.vertex.val, visitedVertices, visitedEdges, outEdges, inEdges)
 		}
 	}
 }
 
 // FindStartAndEndPoint finds start and end point of the path, which is represented by graph.
-// Start point is the vertex, which doesn't have incoming edges,
-// end point is the vertex, which doesn't have out-coming edges
+// Start point is the vertex, which has 1 less incoming edges, than outgoing.
+// End point is the vertex, which has 1 less out-coming, than incoming.
 //
 // Graph should meet conditions:
 //
-//  1. You can find at least 1 way to visit all vertices.
-//     If we are talking about flights, you can't just apper at some airport.
+//  1. You can find at least 1 way to visit all vertices, passing over the same edge only once.
 //
 //  2. Graph doesn't represent round trip by start and end points: since flights are unordered,
 //     if you have pairs like [[Paris, Milan] [Milan, Paris]],
-//     otherwise you can's say, if direction was Paris-Milan-Paris or Milan-Paris-Milan
+//     otherwise you can's say, if direction was Paris-Milan-Paris or Milan-Paris-Milan.
 func (g *Graph) FindStartAndEndPoint() (string, string, error) {
-	visited := make(map[string]bool)
+	visitedVertices := make(map[string]bool)
 	outEdges := make(map[string]int)
 	inEdges := make(map[string]int)
 
 	allVerticesAccessible := false
 
-	// check if exists at least 1 path to visit all vertices
+	// check if exists at least 1 path to visit all vertices,
 	for key, vertex := range g.vertices {
 		allVerticesAccessible = true
 
 		// starting from each vertex,
 		// try to reach all vertices in 1 dfs run
-		if _, found := visited[key]; !found {
-			visited[key] = true
+		if _, found := visitedVertices[key]; !found {
+			visitedVertices[key] = true
 
-			// track visited vertices in current iteration
-			curVisited := make(map[string]bool)
+			// track visitedVertices vertices in current iteration
+			curVisitedVertices := make(map[string]bool)
+			curVisitedEdges := make(map[*Edge]bool)
 
 			// clean up edge cnt - if we would find the way to visit all vertices,
-			// we will get full info about incoming and outgoing edges
 			outEdges = make(map[string]int)
 			inEdges = make(map[string]int)
 
-			g.dfs(vertex.val, curVisited, outEdges, inEdges)
+			// we will get full info about incoming and outgoing edges
+			g.dfs(vertex.val, curVisitedVertices, curVisitedEdges, outEdges, inEdges)
 
 			for _, v := range g.vertices {
-				if !curVisited[v.val] {
+				if !curVisitedVertices[v.val] {
 					allVerticesAccessible = false
 					break
 				}
 			}
 
 			if allVerticesAccessible {
-				// visited all vertices and got all info about edges,
-				// no sense to run dfs again
+				// visitedVertices all vertices and got all info about edges,
+				// no sense to run dfsModified again
 				break
 			}
 		}
