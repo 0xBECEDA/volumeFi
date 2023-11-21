@@ -32,10 +32,9 @@ Also, we assume that:
 
 3. The same flight within a single trip can only be taken once. For example, Berlin -> Paris and Paris -> Berlin can exist within the same trip, but Berlin -> Paris and Berlin -> Paris again are not possible.
 
-4. The start point is a vertex that either has no incoming edges or has one more outgoing edge than incoming edges.
+4. The start point of trip is an airport that either has no incoming flights or has one more outgoing flights than incoming.
 
-5. 5.The end point is a vertex that either has no outgoing edges or has one more incoming edge than outgoing edges.
-
+5. 5.The end point of trip is an airport that either has no outgoing flights or has one more incoming flights than outgoing.
 
 Based on the above, I suggest representing a trip as a directed graph. 
 To ensure that there is at least one path that allows visiting all the nodes of the graph, passing over the same edge only once as well as to count the number of incoming and outgoing edges, 
