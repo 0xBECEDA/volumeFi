@@ -1,0 +1,8 @@
+version: "3"
+services:
+  server:
+    container_name: flights-server
+    hostname: flights-server
+    image: flights-server:latest
+    ports:
+      - "8080:8080"
